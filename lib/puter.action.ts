@@ -52,7 +52,7 @@ export const createProject = async({item}:CreateProjectParams): Promise<DesignIt
     }
 
     const resolvedRender = hostedRender?.url ?
-        hostedRender?.url
+        hostedRender.url
         : item.renderedImage && isHostedUrl(item.renderedImage) ?
             item.renderedImage : undefined;
     
@@ -75,7 +75,7 @@ export const createProject = async({item}:CreateProjectParams): Promise<DesignIt
 
         return payload
     } catch (error) {
-        console.log('Failed to save project',error)
+        console.error('Failed to save project',error)
         return null;
     }
 }

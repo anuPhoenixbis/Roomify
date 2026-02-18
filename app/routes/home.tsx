@@ -39,7 +39,7 @@ export default function Home() {
       return false;
     }
 
-    setProjects((prev=>[newItem,...prev]))
+    setProjects((prev=>[saved,...prev]))
 
     navigate(`/visualizer/${newId}`,{
       // passing down these state values to the visualizer page
@@ -105,7 +105,7 @@ export default function Home() {
         </div>
         <div className="projects-grid">
           {projects.map(({id,name,renderedImage,sourceImage,timestamp})=>(
-            <div className="project-card group">
+            <div className="project-card group" key={id}>
               <div className="preview">
                 <img src={renderedImage || sourceImage} 
                 alt="Project" 
