@@ -2,6 +2,8 @@ import Navbar from "components/Navbar";
 import type { Route } from "./+types/home";
 import { ArrowRight, ArrowUpIcon, ArrowUpRight, Clock, Layers } from "lucide-react";
 import Button from "components/ui/Button";
+import Upload from "components/Upload";
+import { useNavigate } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -11,6 +13,13 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const navigate = useNavigate()
+  const handleUploadComplete = async(bases64Data:string) =>{
+    // on completion of the upload we grab the date make the uuid for the image and pass it down to the visualizer route
+    const newId = Date.now().toString()
+    navigate(`/visualizer/${newId}`)
+    return true
+  }
   return <div className="home">
     <Navbar/>
 
@@ -43,7 +52,13 @@ export default function Home() {
             <p>Supports JPG, PNG ,formats up to 10MB</p>
           </div>
           {/* upload section */}
-          <p>Upload images</p>
+          <Upload 
+              onComplete={handleUploadComplete}
+            // onComplete={(base64Data)=>{
+              // console.log("upload complete:",base64Data)
+              // here we can grab the file ; we must redirect the user to the visualizer page
+            // }}
+          />
         </div>
       </div>
 
