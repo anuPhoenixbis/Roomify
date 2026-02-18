@@ -16,21 +16,37 @@ function Upload({ onComplete }: UploadProps) {
     const [isDragging, setIsDragging] = useState(false)
     const [progress,setProgress] = useState(0)
     const progressRef = useRef<number>(0)
-    const intervalRef = useRef<any>(null)
+    const intervalRef = useRef<ReturnType<typeof setInterval>| null>(null)
+    const timeoutRef = useRef<ReturnType<typeof setTimeout>| null>(null)
     const {isSignedIn} =useOutletContext<AuthContext>()
     useEffect(() => {
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current)
+            if (timeoutRef.current) clearInterval(timeoutRef.current)
         }
     }, [])
 
     const processFile = (fileToProcess: File) => {
         if (!isSignedIn) return
+        // clearing existing timers before starting new ones
+        if(intervalRef.current){
+            clearInterval(intervalRef.current)
+            intervalRef.current=null
+        }
+        if(timeoutRef.current){
+            clearInterval(timeoutRef.current)
+            timeoutRef.current=null
+        }
+
         setFile(fileToProcess)
         setProgress(0)
         progressRef.current = 0
 
         const reader = new FileReader()
+        reader.onerror= () =>{
+            setFile(null)
+            setProgress(0)
+        }
         reader.onload = () => {
             const result = String(reader.result || '')
 
@@ -45,7 +61,8 @@ function Upload({ onComplete }: UploadProps) {
                         intervalRef.current = null
                     }
                     // give a small delay before calling onComplete (simulate redirect)
-                    setTimeout(() => {
+                    timeoutRef.current = setTimeout(() => {
+                        timeoutRef.current=null
                         onComplete?.(result)
                     }, REDIRECT_DELAY_MS)
                 }
