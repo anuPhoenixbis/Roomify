@@ -9,6 +9,12 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { useEffect, useState } from "react";
+import { 
+  getCurrentUser,
+  signIn as PuterSignIn,
+  signOut as PuterSignOut
+ } from "lib/puter.action";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -41,8 +47,57 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+const DEFAULT_AUTH_STATE: AuthState={
+  isSignedIn:false,
+  userName: null,
+  userId: null,
+}
+
 export default function App() {
-  return <Outlet />;
+  const [authState,setAuthState] = useState<AuthState>(DEFAULT_AUTH_STATE)
+
+  const refreshAuth = async()=>{
+    try {
+      // to get current user or else we refresh the auth state back to default
+      // this is similar to the auth.getUser() of clerk ORM
+      const user = await getCurrentUser()
+      setAuthState({
+        isSignedIn:!!user,//if user exists then its set to user
+        userName: user?.username || null,
+        userId:user?.uuid || null
+      })
+      return !!user//if user exists then its return the user
+    } catch (error) {
+      setAuthState(DEFAULT_AUTH_STATE)
+      return false;
+    }
+  }
+
+  useEffect(()=>{
+    refreshAuth()//refreshes the user (fetches the curr user details as soon as the page loads in)
+  },[])
+
+  // doing these ops using the puter lib only
+  const signIn = async()=>{
+    await PuterSignIn()// we sign in with the user details
+    // then we refresh Auth to get the current user details
+    return await refreshAuth()
+  }
+
+  const signOut = async()=>{//similarly for signout
+    await PuterSignOut()
+    return await refreshAuth()
+  }
+
+  // sharing these signIn and signOut functions to global context
+  return (
+    <main className="min-h-screen bg-background text-foreground relative z-10">
+      <Outlet
+      // passing down the functions and values to all the values as props especially to navbar so we can implement it there
+        context={{...authState,refreshAuth,signIn,signOut}}
+      />
+    </main>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
