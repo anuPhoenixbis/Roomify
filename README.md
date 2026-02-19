@@ -1,87 +1,136 @@
-# Welcome to React Router!
+🏠 Roomify – AI-Powered Room Visualizer
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Roomify is a full-stack AI-powered architectural visualization platform that transforms 2D room layouts into AI-generated 3D visualizations.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+Built using modern React architecture, serverless cloud backend via Puter, and generative AI workflows.
 
-## Features
+🚀 Live Concept
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+Upload a room layout →
+AI processes it →
+Generates a realistic 3D visualization →
+Hosts and displays it via cloud infrastructure.
 
-## Getting Started
+✨ Features
 
-### Installation
+🧠 AI-based 3D visualization generation
 
-Install the dependencies:
+☁️ Cloud storage & hosting using Puter
 
-```bash
+⚡ Serverless worker-based AI processing
+
+🖼️ Image upload + preview system
+
+🔄 Dynamic routing with React Router
+
+🐳 Dockerized for deployment
+
+📦 Modular architecture with clean separation of concerns
+
+🛠️ Tech Stack
+Frontend
+
+React + TypeScript
+
+React Router (File-based routing)
+
+Vite
+
+Custom UI components
+
+CSS styling
+
+Backend & Cloud
+
+Puter.js (Web OS + cloud API layer)
+
+Serverless workers (puter.worker.js)
+
+Cloud file hosting
+
+AI action abstraction layer
+
+DevOps
+
+Docker
+
+Type-safe configuration
+
+Modular lib architecture
+
+📁 Project Structure
+app/
+  routes/
+    home.tsx
+    visualizer.$id.tsx
+  root.tsx
+
+components/
+  Navbar.tsx
+  Upload.tsx
+  ui/Button.tsx
+
+lib/
+  ai.actions.ts        → AI request handling
+  puter.action.ts      → Puter API logic
+  puter.hosting.ts     → Cloud hosting
+  puter.worker.js      → Background worker
+  constants.ts
+  utils.ts
+
+🧠 Architecture Overview
+User Upload
+     ↓
+Upload Component
+     ↓
+AI Action (ai.actions.ts)
+     ↓
+Puter Worker
+     ↓
+AI Model Processing
+     ↓
+Hosted Result
+     ↓
+Visualizer Route (/visualizer/:id)
+
+
+The application separates:
+
+UI Layer
+
+AI Logic Layer
+
+Cloud Storage Layer
+
+Worker Processing Layer
+
+This makes it scalable and provider-agnostic.
+
+⚙️ Installation
+
+Clone the repository:
+
+git clone https://github.com/anuPhoenixbis/Roomify.git
+cd Roomify
+
+
+Install dependencies:
+
 npm install
-```
 
-### Development
+🔑 Environment Variables
 
-Start the development server with HMR:
+Create a .env file:
 
-```bash
+PUTER_API_KEY=
+
+
+Add your API keys accordingly.
+
+▶️ Run Locally
 npm run dev
-```
 
-Your application will be available at `http://localhost:5173`.
 
-## Building for Production
+App runs at:
 
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+http://localhost:5173
