@@ -3,7 +3,9 @@ import { generate3DView } from 'lib/ai.actions'
 import { createProject, getProjectById } from 'lib/puter.action'
 import { Box, Download, RefreshCcw, Share2, X } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
+import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import { useLocation, useNavigate, useOutletContext, useParams } from 'react-router'
+import { WhatsappShareButton, TelegramShareButton, PinterestShareButton, WhatsappIcon, TelegramIcon, PinterestIcon } from 'react-share'
 
 function visualizerId() {
     const {id} = useParams();
@@ -16,8 +18,42 @@ function visualizerId() {
 
     const [isProcessing,setIsProcessing] = useState(false)
     const [currentImage, setCurrentImage] = useState<string | null>(null)
+    const [isShareMenuOpen, setIsShareMenuOpen] = useState(false)
 
     const handleBack = () =>navigate('/')
+
+    const handleExport = async () => {
+        if (!currentImage) return;
+
+        try {
+            // fetch the image as a blob
+            const response = await fetch(currentImage);
+            const blob = await response.blob();
+
+            // create a temporary URL for the blob
+            const url = URL.createObjectURL(blob);
+
+            // create an anchor element and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${project?.name || `Residence-${id}`}-render.png`;
+            document.body.appendChild(link);
+            link.click();
+
+            // cleanup
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Failed to export image:', error);
+        }
+    };
+
+    const handleShare = () => {
+        setIsShareMenuOpen(!isShareMenuOpen);
+    };
+
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const shareTitle = `Check out my Roomify design: ${project?.name || `Residence ${id}`}`;
 
     const runGeneration = async(item:DesignItem) =>{
         if(!id || !item.sourceImage) return;
@@ -140,15 +176,50 @@ function visualizerId() {
                     <div className="panel-actions">
                         <Button 
                             size="sm"
-                            onClick={()=>{}}
+                            onClick={handleExport}
                             className='export'
                             disabled={!currentImage}>
                                 <Download className='w-4 h-4 mr-2'/>Export
                             </Button>
-                        <Button size="sm" onClick={()=>{}} className='share'>
-                            <Share2 className='w-4 h-4 mr-2'/>
-                            Share
-                        </Button>
+                        <div className="relative">
+                            <Button 
+                                size="sm" 
+                                onClick={handleShare}
+                                className='share'>
+                                <Share2 className='w-4 h-4 mr-2'/>
+                                Share
+                            </Button>
+                            {isShareMenuOpen && (
+                                <div className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg p-3 z-10 flex gap-2">
+                                    <WhatsappShareButton 
+                                        url={shareUrl}
+                                        title={shareTitle}
+                                        separator=" - "
+                                        className="share-btn">
+                                        <span className="text-sm">
+                                            <WhatsappIcon className='h-10 w-10 rounded'/>
+                                        </span>
+                                    </WhatsappShareButton>
+                                    <TelegramShareButton 
+                                        url={shareUrl}
+                                        title={shareTitle}
+                                        className="share-btn">
+                                        <span className="text-sm">
+                                            <TelegramIcon className='h-10 w-10 rounded'/>
+                                        </span>
+                                    </TelegramShareButton>
+                                    <PinterestShareButton 
+                                        url={shareUrl}
+                                        media={currentImage || ''}
+                                        description={shareTitle}
+                                        className="share-btn">
+                                        <span className="text-sm">
+                                            <PinterestIcon className='h-10 w-10 rounded' />
+                                        </span>
+                                    </PinterestShareButton>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className={`render-area ${isProcessing ? 'is-processing' : ''}`}>
@@ -168,6 +239,43 @@ function visualizerId() {
                                 <span className="title">Rendering...</span>
                                 <span className="subtitle">Generating your 3D visualization</span>
                             </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* comparison slider */}
+            <div className="panel compare">
+                <div className="panel-header">
+                    <div className="panel-meta">
+                        <p>Comparison</p>
+                        <h3>Before and After</h3>
+                    </div>
+                    <div className="hint">Drag to Compare</div>
+                </div>
+                <div className="compare-stage">
+                    {project?.sourceImage && currentImage ? (
+                        <ReactCompareSlider 
+                            defaultValue={50}
+                            style={{width:'100%',height:'auto'}}
+                            itemOne= {
+                                <ReactCompareSliderImage 
+                                    src={project?.sourceImage} 
+                                    alt='before'
+                                    className='compare-img'/>
+                            }
+                            itemTwo= {
+                                <ReactCompareSliderImage
+                                    src={currentImage ?? project?.renderedImage ?? undefined} 
+                                    alt="after"
+                                    className='compare-img' />
+                            }
+                            />
+                    ):(
+                        <div className="compare-fallback">
+                            {project?.sourceImage && (
+                                <img src={project.sourceImage} alt="Before" className='compare-img' />
+                            )}
                         </div>
                     )}
                 </div>
