@@ -20,10 +20,9 @@ export default function Home() {
   const isCreatingProjectRef = useRef(false)
 
   const handleUploadComplete = async(bases64Data:string) =>{
+    if(isCreatingProjectRef.current) return false;
+    isCreatingProjectRef.current = true
     try {
-      
-        if(isCreatingProjectRef.current) return false;
-        isCreatingProjectRef.current = true
         
         // on completion of the upload we grab the date make the uuid for the image and pass it down to the visualizer route
         const newId = Date.now().toString()
